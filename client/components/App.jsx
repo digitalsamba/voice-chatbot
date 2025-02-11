@@ -1,9 +1,7 @@
-// client/components/App.jsx
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ModelSelection from "./ModelSelection";
 import RealTimeConfiguration from "./RealTimeConfiguration";
 import RealTimeSession from "./RealTimeSession";
-import { useEffect } from "react";
 
 export default function App() {
   // Состояние текущего представления: 'menu' | 'configuration' | 'session'
@@ -162,6 +160,7 @@ export default function App() {
       await mergeAudio();
 
       // Обновляем состояние сессии и переключаем представление
+      // (Оставляем статус для обратной совместимости, но он не используется для анимации круга)
       setSessionState((prev) => ({ ...prev, status: "listening..." }));
       setView("session");
     } catch (err) {
@@ -197,6 +196,7 @@ export default function App() {
     setSessionState({ status: "idle", muted: false });
     setView("menu");
   }
+
   // Функция переключения mute – отключает/включает аудиотреки
   function toggleMute() {
     if (peerConnection.current) {
@@ -210,7 +210,6 @@ export default function App() {
     setSessionState((prev) => ({ ...prev, muted: !prev.muted }));
     console.log(sessionState.muted ? "Microphone unmuted" : "Microphone muted");
   }
-
 
   return (
     <div className="app-container">
@@ -230,6 +229,7 @@ export default function App() {
           return () => clearTimeout(timer);
         }
       }, [apiError])}
+
       {view === "menu" && (
         <ModelSelection onSelectRealTime={() => setView("configuration")} />
       )}
