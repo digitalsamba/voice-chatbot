@@ -115,3 +115,46 @@ canvas {
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;
 }
+
+@supports (padding: max(0px)) {
+  .safe-area-padding {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (pointer: coarse) {
+  button {
+    touch-action: manipulation;
+  }
+
+  .session-container {
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+}
+
+/* Улучшение скролла для textarea */
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 #f0f0f0;
+}
+
+/* Кастомный скролл для WebKit */
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #3b82f6;
+  border-radius: 4px;
+}

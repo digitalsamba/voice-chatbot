@@ -212,7 +212,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-container">
+    <div className="app-container min-h-screen bg-gradient-to-r from-[#ffc3a0] to-[#ffafbd]">
       {/* Уведомление об ошибке, например, превышен лимит сессий */}
       {apiError && (
         <div className="api-error fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded z-50">

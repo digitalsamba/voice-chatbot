@@ -24,43 +24,48 @@ export default function ModelSelection({ onSelectRealTime }) {
   };
 
   return (
-    <div className="menu-container flex flex-col items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-8">Select Model</h1>
-      <div className="menu-options flex gap-4 relative">
-        {/* Other Models Button */}
-        <div className="relative">
-          <button
-            className="menu-button px-6 py-3 bg-gray-400 text-white rounded cursor-not-allowed"
-            disabled
-          >
-            Other Models
-          </button>
-          <div
-            className="absolute -top-0.5 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center cursor-help hover:bg-gray-400 transition-colors"
-            onMouseEnter={() => setHoveredModel('other')}
-            onMouseLeave={() => setHoveredModel(null)}
-          >
-            <span className="text-gray-600 text-xs">i</span>
+    <div className="menu-container flex flex-col items-center justify-center min-h-screen p-4">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Select Model
+        </h1>
+        <div className="menu-options flex flex-col sm:flex-row gap-4 relative">
+          {/* Other Models Button */}
+          <div className="relative flex-1">
+            <button
+              className="menu-button w-full px-4 py-3 sm:px-6 sm:py-3 text-sm sm:text-base bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+              disabled
+            >
+              Other Models
+            </button>
+            <div
+              className="absolute -top-0.5 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center cursor-help hover:bg-gray-400 transition-colors"
+              onMouseEnter={() => setHoveredModel('other')}
+              onMouseLeave={() => setHoveredModel(null)}
+            >
+              <span className="text-gray-600 text-xs">i</span>
+            </div>
+            {/* Info icon и tooltip остаются без изменений */}
           </div>
-        </div>
 
-        {/* Real-Time Button */}
-        <div className="relative">
-          <button
-            className="menu-button px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-500"
-            onClick={onSelectRealTime}
-          >
-            Real-Time Model
-          </button>
-          <div
-            className="absolute -top-0.5 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center cursor-help hover:bg-gray-400 transition-colors"
-            onMouseEnter={() => setHoveredModel('realtime')}
-            onMouseLeave={() => setHoveredModel(null)}
-          >
-            <span className="text-gray-600 text-xs">i</span>
+          {/* Real-Time Button */}
+          <div className="relative flex-1">
+            <button
+              className="menu-button w-full px-4 py-3 sm:px-6 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200"
+              onClick={onSelectRealTime}
+            >
+              Real-Time
+            </button>
+            <div
+              className="absolute -top-0.5 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center cursor-help hover:bg-gray-400 transition-colors"
+              onMouseEnter={() => setHoveredModel('realtime')}
+              onMouseLeave={() => setHoveredModel(null)}
+            >
+              <span className="text-gray-600 text-xs">i</span>
+            </div>
           </div>
         </div>
-        {/* Tooltips */}
+        {/* Tooltip container */}
         {hoveredModel && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2">
             {tooltips[hoveredModel]}

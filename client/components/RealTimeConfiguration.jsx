@@ -1,4 +1,3 @@
-// client/components/RealTimeConfiguration.jsx
 import React, { useEffect, useState } from "react";
 
 export default function RealTimeConfiguration({
@@ -8,9 +7,10 @@ export default function RealTimeConfiguration({
                                                 onModelCreate,
                                               }) {
   const [microphones, setMicrophones] = useState([]);
+  const [isMicLoading, setIsMicLoading] = useState(true);
 
   useEffect(() => {
-    async function getMicrophones() {
+    const getMicrophones = async () => {
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -20,9 +20,11 @@ export default function RealTimeConfiguration({
           setConfig((prev) => ({ ...prev, microphoneId: mics[0].deviceId }));
         }
       } catch (err) {
-        console.error("Error accessing microphone devices:", err);
+        console.error("Microphone access error:", err);
+      } finally {
+        setIsMicLoading(false);
       }
-    }
+    };
     getMicrophones();
   }, [setConfig, config.microphoneId]);
 
@@ -38,103 +40,108 @@ export default function RealTimeConfiguration({
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-    <div className="configuration-container max-w-lg mx-auto mt-12 p-6 bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-4">Real-Time Model Configuration</h2>
+    <div className="min-h-screen bg-gradient-to-r from-[#ffc3a0] to-[#ffafbd] p-4 flex items-center justify-center">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Real-Time Settings
+        </h2>
 
-      <div className="config-item mb-4">
-        <label htmlFor="voiceSelect" className="block mb-1 font-medium">
-          Select Voice:
-        </label>
-        <select
-          id="voiceSelect"
-          className="w-full border rounded p-2"
-          value={config.voice}
-          onChange={(e) => {
-            console.log("Selected voice:", e.target.value);
-            setConfig((prev) => ({ ...prev, voice: e.target.value }));
-          }}
-        >
-          {voiceOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+        {/* Voice Selection */}
+        <div className="mb-5">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Voice Style
+          </label>
+          <select
+            value={config.voice}
+            onChange={(e) => setConfig({ ...config, voice: e.target.value })}
+            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
+          >
+            {voiceOptions.map((voice) => (
+              <option key={voice.value} value={voice.value}>
+                {voice.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div className="config-item mb-4">
-        <label htmlFor="instructionInput" className="block mb-1 font-medium">
-          Instruction:
-        </label>
-        <textarea
-          id="instructionInput"
-          className="w-full border rounded p-2"
-          value={config.instructions}
-          onChange={(e) => {
-            const newInstructions = e.target.value.slice(0, 1000);
-            setConfig((prev) => ({ ...prev, instructions: newInstructions }));
-          }}
-          placeholder="e.g. Speak like a kind young programmer with extensive experience."
-        />
-      </div>
+        {/* Instructions Input */}
+        <div className="mb-5">
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Custom Instructions
+            </label>
+            <span className="text-xs text-gray-500">
+              {config.instructions.length}/1000
+            </span>
+          </div>
+          <textarea
+            value={config.instructions}
+            onChange={(e) =>
+              setConfig({
+                ...config,
+                instructions: e.target.value.slice(0, 1000),
+              })
+            }
+            placeholder="Example: Speak like a friendly tech assistant..."
+            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm h-32 resize-none"
+          />
+        </div>
 
-      <div className="config-item mb-4">
+        {/* Generate Prompt Button */}
         <button
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500"
           onClick={onCreatePrompt}
+          className="w-full mb-5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 text-sm"
         >
-          Create Prompt
+          Generate AI Prompt
         </button>
-      </div>
 
-      <div className="config-item mb-4">
-        <label htmlFor="micSelect" className="block mb-1 font-medium">
-          Select Microphone:
+        {/* Microphone Selection */}
+        <div className="mb-5">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Microphone
+          </label>
+          {isMicLoading ? (
+            <div className="animate-pulse bg-gray-100 h-10 rounded-lg" />
+          ) : (
+            <select
+              value={config.microphoneId}
+              onChange={(e) =>
+                setConfig({ ...config, microphoneId: e.target.value })
+              }
+              className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white"
+            >
+              {microphones.map((mic) => (
+                <option key={mic.deviceId} value={mic.deviceId}>
+                  {mic.label || "Default Microphone"}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Mic Disabled Toggle */}
+        <label className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+          <input
+            type="checkbox"
+            checked={config.startWithMicDisabled}
+            onChange={(e) =>
+              setConfig({ ...config, startWithMicDisabled: e.target.checked })
+            }
+            className="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700">
+            Start with microphone muted
+          </span>
         </label>
-        <select
-          id="micSelect"
-          className="w-full border rounded p-2"
-          value={config.microphoneId}
-          onChange={(e) =>
-            setConfig((prev) => ({ ...prev, microphoneId: e.target.value }))
-          }
-        >
-          {microphones.map((mic) => (
-            <option key={mic.deviceId} value={mic.deviceId}>
-              {mic.label || "Microphone"}
-            </option>
-          ))}
-        </select>
-      </div>
 
-      <div className="config-item mb-4 flex items-center">
-        <input
-          id="micToggle"
-          type="checkbox"
-          checked={config.startWithMicDisabled}
-          onChange={(e) =>
-            setConfig((prev) => ({
-              ...prev,
-              startWithMicDisabled: e.target.checked,
-            }))
-          }
-          className="mr-2"
-        />
-        <label htmlFor="micToggle" className="font-medium">
-          Start dialogue with microphone disabled
-        </label>
-      </div>
-
-      <div className="config-item">
+        {/* Start Button */}
         <button
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
           onClick={onModelCreate}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3.5 px-6 rounded-lg transition-all duration-200 text-sm transform hover:scale-[1.02] active:scale-95"
         >
-          Create Model
+          Start Real-Time Session
         </button>
       </div>
-    </div>
     </div>
   );
 }

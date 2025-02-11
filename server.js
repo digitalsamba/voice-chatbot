@@ -1,10 +1,24 @@
+// server.js
 import Fastify from "fastify";
 import FastifyVite from "@fastify/vite";
 import fastifyEnv from "@fastify/env";
+import fs from "fs";
+import path from "path";
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const server = Fastify({
-  logger: true
+  https: {
+    key: fs.readFileSync(path.join(__dirname, 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
+  },
+  logger: {
+    transport: {
+      target: "@fastify/one-line-logger",
+    },
+  },
 });
+
 
 const schema = {
   type: "object",
@@ -78,27 +92,61 @@ server.post("/token", async (request, reply) => {
     return { error: err.message };
   }
 });
-
 server.post('/end', async (request, reply) => {
   activeSessions = Math.max(activeSessions - 1, 0);
   server.log.info(`Сессия завершена клиентом. Активных: ${activeSessions}`);
   reply.send({ status: 'ok' });
 });
 
-server.get("/prompt", async () => {
-  const prompts = [
-    "Speak like a kind young programmer with extensive experience.",
-    "Respond as a friendly mentor with a passion for technology.",
-    "Answer as a knowledgeable expert in modern software development.",
+server.get("/prompt", async (request, reply) => {
+  const topics = [
+    "adventure", "space", "technology", "mystery", "fantasy",
+    "history", "future", "detective", "psychology", "post-apocalypse",
+    "mythology", "time travel", "cyberpunk", "survival", "urban legends"
   ];
-  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-  return { instruction: randomPrompt };
+  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+
+  // Construct the prompt message for the OpenAI Chat API
+  const promptMessage = `Create a text instruction for the AI that defines its communication style with the user. The instruction should be concise, written in a single paragraph, and include only interaction rules without greetings or unnecessary details. Each time, generate a new, original instruction to make the AI unique. You can give it a personality, style, or a distinctive manner of communication.. Theme: ${randomTopic}.`;
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo", // Use the chat model with the chat completions endpoint
+        messages: [
+          { role: "user", content: promptMessage }
+        ],
+        max_tokens: 150,
+        temperature: 0.7,
+        n: 1
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      reply.status(response.status);
+      return { error: data };
+    }
+
+    // For chat completions, the generated text is in data.choices[0].message.content
+    const generatedInstruction = data.choices[0]?.message?.content?.trim() || "No instruction generated.";
+    return { instruction: generatedInstruction };
+  } catch (err) {
+    reply.status(500);
+    return { error: err.message };
+  }
 });
 
 await server.listen({
   port: process.env.PORT || 3001,
   host: '0.0.0.0',
   listenTextResolver: (address) => {
-    return `Server listening on http://${address}`;
+    return `Server listening on https://${address}`;
   }
 });
