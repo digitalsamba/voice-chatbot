@@ -1,24 +1,10 @@
-// server.js
 import Fastify from "fastify";
 import FastifyVite from "@fastify/vite";
 import fastifyEnv from "@fastify/env";
-import fs from "fs";
-import path from "path";
-
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const server = Fastify({
-  https: {
-    key: fs.readFileSync(path.join(__dirname, 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
-  },
-  logger: {
-    transport: {
-      target: "@fastify/one-line-logger",
-    },
-  },
+  logger: true
 });
-
 
 const schema = {
   type: "object",
@@ -92,6 +78,7 @@ server.post("/token", async (request, reply) => {
     return { error: err.message };
   }
 });
+
 server.post('/end', async (request, reply) => {
   activeSessions = Math.max(activeSessions - 1, 0);
   server.log.info(`Сессия завершена клиентом. Активных: ${activeSessions}`);
@@ -143,10 +130,11 @@ server.get("/prompt", async (request, reply) => {
   }
 });
 
+
 await server.listen({
   port: process.env.PORT || 3001,
   host: '0.0.0.0',
   listenTextResolver: (address) => {
-    return `Server listening on https://${address}`;
+    return `Server listening on http://${address}`;
   }
 });
