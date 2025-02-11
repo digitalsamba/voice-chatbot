@@ -1,0 +1,134 @@
+{
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/react-dom/cjs/react-dom.production.min.js?commonjs-exports": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/react-dom/index.js?commonjs-module": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/react/cjs/react-jsx-runtime.production.min.js?commonjs-exports": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/react/cjs/react.production.min.js?commonjs-exports": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/react/index.js?commonjs-module": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/react/jsx-runtime.js?commonjs-module": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/scheduler/cjs/scheduler.production.min.js?commonjs-exports": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000/Users/ari/PhpstormProjects/voice-chatbot-test11/node_modules/scheduler/index.js?commonjs-module": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000commonjsHelpers.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000vite/modulepreload-polyfill.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../\u0000vite/preload-helper.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:context.js": [
+    "/assets/_context-DXYyVgIs.js"
+  ],
+  "../../../../../:core.jsx": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:create.jsx": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:layouts.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:layouts/default.jsx": [
+    "/assets/default-CTGZad7X.js"
+  ],
+  "../../../../../:mount.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:resource.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:root.jsx": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../../../../../:routes.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/@remix-run/router/dist/router.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/history/index.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/proxy-compare/dist/index.modern.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react-dom/cjs/react-dom.production.min.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react-dom/client.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react-dom/index.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react-router-dom/dist/index.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react-router/dist/index.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react/cjs/react-jsx-runtime.production.min.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react/cjs/react.production.min.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react/index.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/react/jsx-runtime.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/scheduler/cjs/scheduler.production.min.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/scheduler/index.js": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/unihead/client.mjs": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "../node_modules/valtio/esm/vanilla.mjs": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "base.css": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "components/App.jsx": [
+    "/assets/index-t7xi0YUJ.js"
+  ],
+  "components/CircleAnimation.jsx": [
+    "/assets/index-t7xi0YUJ.js"
+  ],
+  "components/ModelSelection.jsx": [
+    "/assets/index-t7xi0YUJ.js"
+  ],
+  "components/RealTimeConfiguration.jsx": [
+    "/assets/index-t7xi0YUJ.js"
+  ],
+  "components/RealTimeSession.jsx": [
+    "/assets/index-t7xi0YUJ.js"
+  ],
+  "index.html": [
+    "/assets/voice-chat-ai-logo-D6XJKSKy.svg"
+  ],
+  "pages/index.jsx": [
+    "/assets/index-t7xi0YUJ.js"
+  ]
+}
