@@ -12,11 +12,7 @@ const server = Fastify({
     key: fs.readFileSync(path.join(__dirname, 'key.pem')),
     cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
   },
-  logger: {
-    transport: {
-      target: "@fastify/one-line-logger",
-    },
-  },
+  logger: true
 });
 
 
