@@ -173,24 +173,26 @@ function RealTimeConfiguration({
     ) })
   ] }) });
 }
-const CircleAnimation = ({ audioContext, analyser, isMuted, aiState }) => {
+const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
   const isMounted = useRef(true);
   const circles = useRef([]);
   const gradients = useRef([]);
-  const aiStateRef = useRef(aiState);
-  const isMutedRef = useRef(isMuted);
   const baseRadius = useRef(0);
   const smoothMultiplier = useRef(1);
   useEffect(() => {
-    aiStateRef.current = aiState;
-    isMutedRef.current = isMuted;
-  }, [aiState, isMuted]);
-  useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     isMounted.current = true;
+    const handleUserInteraction = () => {
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    };
+    canvas.addEventListener("touchstart", handleUserInteraction);
+    canvas.addEventListener("click", handleUserInteraction);
     const dpr = window.devicePixelRatio || 1;
     const size = 400;
     const w = size * dpr;
@@ -269,12 +271,8 @@ const CircleAnimation = ({ audioContext, analyser, isMuted, aiState }) => {
       if (!isMounted.current) return;
       const rawAudioLevel = updateAudioLevel();
       const smoothAudioLevel = lerp(0.1, rawAudioLevel, 1);
-      const targetMultiplier = aiStateRef.current === "thinking" ? 0.95 : aiStateRef.current === "speaking" ? 1.15 : 1;
-      smoothMultiplier.current = lerp(
-        smoothMultiplier.current,
-        targetMultiplier,
-        0.15
-      );
+      const targetMultiplier = 1;
+      smoothMultiplier.current = lerp(smoothMultiplier.current, targetMultiplier, 0.15);
       ctx.clearRect(0, 0, w, h);
       ctx.globalCompositeOperation = "screen";
       ctx.globalAlpha = 0.9;
@@ -289,12 +287,7 @@ const CircleAnimation = ({ audioContext, analyser, isMuted, aiState }) => {
           const audioEffect = 1 + smoothAudioLevel * 1.5;
           point.phase += random(-0.05, 0.05) * smoothMultiplier.current * audioEffect;
           let dynamicRadius = baseRadius.current * smoothMultiplier.current;
-          if (!isMutedRef.current) {
-            dynamicRadius += Math.min(
-              smoothAudioLevel * 100 * dpr,
-              50 * dpr
-            );
-          }
+          dynamicRadius += Math.min(smoothAudioLevel * 100 * dpr, 50 * dpr);
           const amplitude = point.range * Math.sin(point.phase * audioEffect);
           const targetX = center.x + (dynamicRadius + amplitude) * Math.cos(point.radian);
           const targetY = center.y + (dynamicRadius + amplitude) * Math.sin(point.radian);
@@ -315,8 +308,10 @@ const CircleAnimation = ({ audioContext, analyser, isMuted, aiState }) => {
     return () => {
       isMounted.current = false;
       cancelAnimationFrame(animationFrameId.current);
+      canvas.removeEventListener("touchstart", handleUserInteraction);
+      canvas.removeEventListener("click", handleUserInteraction);
     };
-  }, [analyser]);
+  }, [analyser, audioContext]);
   return /* @__PURE__ */ jsx(
     "canvas",
     {
@@ -334,21 +329,11 @@ function RealTimeSession({
   analyser
 }) {
   const [timeLeft, setTimeLeft] = useState(300);
-  const [aiState, setAiState] = useState("listening");
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev > 0 ? prev - 1 : 0);
     }, 1e3);
-    const aiInterval = setInterval(() => {
-      setAiState((prev) => {
-        const states = ["listening", "thinking", "speaking"];
-        return states[(states.indexOf(prev) + 1) % states.length];
-      });
-    }, 5e3);
-    return () => {
-      clearInterval(timer);
-      clearInterval(aiInterval);
-    };
+    return () => clearInterval(timer);
   }, []);
   useEffect(() => {
     if (timeLeft === 0) {
@@ -356,6 +341,19 @@ function RealTimeSession({
     }
   }, [timeLeft, terminateSession]);
   const formattedTime = `${Math.floor(timeLeft / 60).toString().padStart(2, "0")}:${(timeLeft % 60).toString().padStart(2, "0")}`;
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    };
+    document.addEventListener("touchstart", handleUserInteraction);
+    document.addEventListener("click", handleUserInteraction);
+    return () => {
+      document.removeEventListener("touchstart", handleUserInteraction);
+      document.removeEventListener("click", handleUserInteraction);
+    };
+  }, [audioContext]);
   return /* @__PURE__ */ jsxs("div", { className: "session-container relative flex flex-col items-center justify-center h-screen bg-gray-50", children: [
     /* @__PURE__ */ jsx("div", { className: "absolute top-4 right-4 bg-white px-4 py-2 rounded shadow z-10", children: /* @__PURE__ */ jsx("span", { className: "font-mono", children: formattedTime }) }),
     /* @__PURE__ */ jsx("div", { className: "mb-16", children: /* @__PURE__ */ jsx(
@@ -363,8 +361,7 @@ function RealTimeSession({
       {
         audioContext,
         analyser,
-        isMuted: sessionState.muted,
-        aiState
+        isMuted: sessionState.muted
       }
     ) }),
     /* @__PURE__ */ jsxs("div", { className: "absolute bottom-24 flex gap-4 z-10", children: [

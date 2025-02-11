@@ -9,13 +9,21 @@ const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
   const baseRadius = useRef(0);
   const smoothMultiplier = useRef(1);
 
-  // Логика, связанная с aiState, удалена – анимация теперь всегда
-  // зависит от данных анализатора звука
-
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     isMounted.current = true;
+
+    // Обработчик для возобновления AudioContext при взаимодействии (для мобильных устройств)
+    const handleUserInteraction = () => {
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    };
+
+    canvas.addEventListener("touchstart", handleUserInteraction);
+    canvas.addEventListener("click", handleUserInteraction);
 
     const dpr = window.devicePixelRatio || 1;
     const size = 400;
@@ -41,7 +49,7 @@ const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
         ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, baseRadius.current),
         ctx.createLinearGradient(0, 0, w, 0),
         ctx.createLinearGradient(0, 0, w, 0),
-        ctx.createLinearGradient(0, 0, w, 0)
+        ctx.createLinearGradient(0, 0, w, 0),
       ];
 
       gradients.current[0].addColorStop(0, "rgba(255,255,255,0.9)");
@@ -69,7 +77,7 @@ const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
             radian: radian,
             range: random(18, 25),
             phase: random(0, pi * 2),
-            baseRadius: baseRadius.current
+            baseRadius: baseRadius.current,
           });
         }
         circles.current.push(swingpoints);
@@ -111,7 +119,7 @@ const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
       const rawAudioLevel = updateAudioLevel();
       const smoothAudioLevel = lerp(0.1, rawAudioLevel, 1.0);
 
-      // Используем постоянный множитель, так как логика aiState убрана
+      // Всегда используем множитель 1, поскольку логика aiState удалена
       const targetMultiplier = 1;
       smoothMultiplier.current = lerp(smoothMultiplier.current, targetMultiplier, 0.15);
 
@@ -133,7 +141,7 @@ const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
           point.phase += random(-0.05, 0.05) * smoothMultiplier.current * audioEffect;
 
           let dynamicRadius = baseRadius.current * smoothMultiplier.current;
-          // Всегда добавляем эффект аудио независимо от mute, чтобы при речи ИИ анимация продолжалась
+          // Всегда добавляем аудио-эффект, независимо от mute
           dynamicRadius += Math.min(smoothAudioLevel * 100 * dpr, 50 * dpr);
 
           const amplitude = point.range * Math.sin(point.phase * audioEffect);
@@ -161,8 +169,10 @@ const CircleAnimation = ({ audioContext, analyser, isMuted }) => {
     return () => {
       isMounted.current = false;
       cancelAnimationFrame(animationFrameId.current);
+      canvas.removeEventListener("touchstart", handleUserInteraction);
+      canvas.removeEventListener("click", handleUserInteraction);
     };
-  }, [analyser]);
+  }, [analyser, audioContext]);
 
   return (
     <canvas

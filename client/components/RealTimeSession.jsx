@@ -6,7 +6,7 @@ export default function RealTimeSession({
                                           toggleMute,
                                           terminateSession,
                                           audioContext,
-                                          analyser
+                                          analyser,
                                         }) {
   const [timeLeft, setTimeLeft] = useState(300);
 
@@ -27,6 +27,23 @@ export default function RealTimeSession({
   const formattedTime = `${Math.floor(timeLeft / 60)
     .toString()
     .padStart(2, "0")}:${(timeLeft % 60).toString().padStart(2, "0")}`;
+
+  // Дополнительно: обработчики для возобновления AudioContext на уровне документа
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    };
+
+    document.addEventListener("touchstart", handleUserInteraction);
+    document.addEventListener("click", handleUserInteraction);
+
+    return () => {
+      document.removeEventListener("touchstart", handleUserInteraction);
+      document.removeEventListener("click", handleUserInteraction);
+    };
+  }, [audioContext]);
 
   return (
     <div className="session-container relative flex flex-col items-center justify-center h-screen bg-gray-50">
