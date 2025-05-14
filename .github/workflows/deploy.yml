@@ -66,74 +66,6 @@ jobs:
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:${{ github.sha }}
 
-      - name: Create deployment script
-        run: |
-          cat > deploy.sh << 'EOF'
-          #!/bin/bash
-          set -e
-          
-          # Set deployment directory (use environment variable or default)
-          DEPLOY_DIR=${DEPLOY_DIR:-/opt/deployment/voice-chatbot-dev}
-          
-          # Create deployment directory if it doesn't exist
-          mkdir -p $DEPLOY_DIR
-          cd $DEPLOY_DIR
-          
-          # Create .env file
-          cat > .env << 'EOL'
-          OPENAI_API_KEY=OPENAI_API_KEY_PLACEHOLDER
-          PORT=PORT_PLACEHOLDER
-          NODE_ENV=development
-          VIRTUAL_HOST=DEV_DOMAIN_PLACEHOLDER
-          VIRTUAL_PORT=PORT_PLACEHOLDER
-          LETSENCRYPT_HOST=DEV_DOMAIN_PLACEHOLDER
-          LETSENCRYPT_EMAIL=LETSENCRYPT_EMAIL_PLACEHOLDER
-          EOL
-          
-          # Replace placeholders with actual values
-          sed -i "s/OPENAI_API_KEY_PLACEHOLDER/${OPENAI_API_KEY}/g" .env
-          sed -i "s/PORT_PLACEHOLDER/${PORT}/g" .env
-          sed -i "s/DEV_DOMAIN_PLACEHOLDER/${DEV_DOMAIN}/g" .env
-          sed -i "s/LETSENCRYPT_EMAIL_PLACEHOLDER/${LETSENCRYPT_EMAIL}/g" .env
-          
-          # Stop any existing container
-          docker stop voice-chatbot-dev || true
-          docker rm voice-chatbot-dev || true
-          
-          # Create logs directory
-          mkdir -p logs
-          
-          # Pull the latest image
-          docker pull ${DOCKER_USERNAME}/voice-chatbot:dev
-          
-          # Run the container with docker run
-          docker run -d --restart unless-stopped \
-            --name voice-chatbot-dev \
-            --network nginx-proxy-network \
-            -p ${PORT}:${PORT} \
-            -e VIRTUAL_HOST=${DEV_DOMAIN} \
-            -e LETSENCRYPT_HOST=${DEV_DOMAIN} \
-            -e LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL} \
-            -e VIRTUAL_PORT=${PORT} \
-            -e PORT=${PORT} \
-            -e NODE_ENV=development \
-            -e OPENAI_API_KEY=${OPENAI_API_KEY} \
-            -v $PWD/logs:/app/logs \
-            ${DOCKER_USERNAME}/voice-chatbot:dev
-          
-          # Show logs
-          docker logs voice-chatbot-dev --tail 50
-          EOF
-          
-          # Replace placeholders with actual values
-          sed -i "s/OPENAI_API_KEY_PLACEHOLDER/${{ secrets.OPENAI_API_KEY }}/g" deploy.sh
-          sed -i "s/PORT_PLACEHOLDER/${{ secrets.PORT || 3011 }}/g" deploy.sh
-          sed -i "s/DEV_DOMAIN_PLACEHOLDER/${{ secrets.DEV_DOMAIN || 'dev.example.com' }}/g" deploy.sh
-          sed -i "s/LETSENCRYPT_EMAIL_PLACEHOLDER/${{ secrets.LETSENCRYPT_EMAIL }}/g" deploy.sh
-          sed -i "s/DOCKER_USERNAME/${{ secrets.DOCKER_HUB_USERNAME }}/g" deploy.sh
-          
-          chmod +x deploy.sh
-      
       - name: Setup SSH for deployment
         uses: webfactory/ssh-agent@v0.8.0
         with:
@@ -144,13 +76,40 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
           
-      - name: Copy deployment script to server
-        run: scp deploy.sh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/
-          
-      - name: Run deployment script on server
+      - name: Deploy to server
         run: |
-          if [ -n "${{ secrets.DEPLOY_DIR }}" ]; then
-            ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "DEPLOY_DIR=${{ secrets.DEPLOY_DIR }} bash /tmp/deploy.sh"
-          else
-            ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "bash /tmp/deploy.sh"
-          fi
+          # Define deployment variables
+          PORT="${{ secrets.PORT || 3011 }}"
+          DEV_DOMAIN="${{ secrets.DEV_DOMAIN || 'dev.example.com' }}"
+          DEPLOY_DIR="${{ secrets.DEPLOY_DIR || '/opt/deployment/voice-chatbot-dev' }}"
+          
+          # Execute deployment commands on server
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << EOF
+            # Create directories if needed
+            mkdir -p ${DEPLOY_DIR}/logs
+            
+            # Stop and remove existing container
+            docker stop voice-chatbot-dev || true
+            docker rm voice-chatbot-dev || true
+            
+            # Pull the latest image
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+            
+            # Run the container with docker run
+            docker run -d --restart unless-stopped \\
+              --name voice-chatbot-dev \\
+              --network nginx-proxy-network \\
+              -p ${PORT}:${PORT} \\
+              -e VIRTUAL_HOST=${DEV_DOMAIN} \\
+              -e LETSENCRYPT_HOST=${DEV_DOMAIN} \\
+              -e LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \\
+              -e VIRTUAL_PORT=${PORT} \\
+              -e PORT=${PORT} \\
+              -e NODE_ENV=development \\
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \\
+              -v ${DEPLOY_DIR}/logs:/app/logs \\
+              ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+            
+            # Show container logs
+            docker logs voice-chatbot-dev --tail 20
+          EOF
