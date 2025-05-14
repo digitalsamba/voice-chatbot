@@ -88,38 +88,30 @@ jobs:
             LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             EOL
             
-            # Create or update docker-compose.yml
-            cat > docker-compose.yml << EOL
-            version: '3'
+            # Stop any existing container
+            docker stop voice-chatbot-dev || true
+            docker rm voice-chatbot-dev || true
             
-            services:
-              voice-chatbot:
-                image: ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
-                restart: unless-stopped
-                command: npm run dev
-                expose:
-                  - "${{ secrets.PORT || 3011 }}"
-                env_file:
-                  - .env
-                volumes:
-                  - ./logs:/app/logs
-                  - ./node_modules:/app/node_modules
-                networks:
-                  - nginx-proxy-network
+            # Create logs directory
+            mkdir -p logs
             
-            networks:
-              nginx-proxy-network:
-                external: true
-            EOL
+            # Pull the latest image
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
             
-            # Pull the latest Docker image
-            docker-compose pull
+            # Run the container with docker run
+            docker run -d --restart unless-stopped \
+              --name voice-chatbot-dev \
+              --network nginx-proxy-network \
+              -p ${{ secrets.PORT || 3011 }}:${{ secrets.PORT || 3011 }} \
+              -e VIRTUAL_HOST=${{ secrets.DEV_DOMAIN || 'dev.example.com' }} \
+              -e LETSENCRYPT_HOST=${{ secrets.DEV_DOMAIN || 'dev.example.com' }} \
+              -e LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
+              -e VIRTUAL_PORT=${{ secrets.PORT || 3011 }} \
+              -e PORT=${{ secrets.PORT || 3011 }} \
+              -e NODE_ENV=development \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              -v $PWD/logs:/app/logs \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
             
-            # Stop and remove existing container
-            docker-compose down
-            
-            # Start the new container
-            docker-compose up -d
-            
-            # Show logs
-            docker-compose logs --tail 50
+            # Show logs (without follow to not block the workflow)
+            docker logs voice-chatbot-dev --tail 50
