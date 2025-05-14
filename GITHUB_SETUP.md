@@ -44,6 +44,7 @@ For deployment with GitHub Actions, you need to add these repository secrets:
    **Optional secrets:**
    - `PORT`: Custom port (defaults to 3011 if not specified)
    - `DEPLOY_DIR`: Custom deployment directory (defaults to /opt/deployment/voice-chatbot-dev)
+   - `DOCKER_NETWORK`: Docker network to connect to (defaults to "proxy")
 
 ## Initializing the Local Repository
 
