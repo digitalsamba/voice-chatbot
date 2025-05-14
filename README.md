@@ -112,18 +112,28 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## CI/CD with GitHub Actions
 
-This project includes a GitHub Actions workflow for continuous integration and deployment:
+This project includes a GitHub Actions workflow for continuous integration and deployment to a development environment:
 
-1. Automatically builds and pushes Docker image to GitHub Container Registry
-2. Deploys to your server using SSH
-3. Uses the deploy.sh script to handle deployment details
+1. Automatically builds and pushes Docker image to Docker Hub with `dev` and commit SHA tags
+2. Deploys to your development server using SSH
+3. Sets up all necessary configuration files on the server with development-specific settings
 
-To set up GitHub Actions deployment:
+To set up the development CI/CD pipeline:
 
-1. Create a GitHub repository for this project
-2. Add the repository secrets described in GITHUB_SETUP.md
-3. Push your code to the repository
-4. GitHub Actions will automatically deploy on push to the main branch
+1. **Server Setup**:
+   - Follow the instructions in [SERVER_SETUP.md](SERVER_SETUP.md) to set up your server with nginx-proxy
+   - Ensure the nginx-proxy-network exists on your server
+
+2. **GitHub Setup**:
+   - Configure your GitHub repository as described in [GITHUB_SETUP.md](GITHUB_SETUP.md)
+   - Create a "development" environment in your GitHub repository
+   - Add all required repository secrets to the development environment
+
+3. **Deployment**:
+   - Push your code to the repository's main branch
+   - GitHub Actions will automatically build and deploy the application to your development server
+   - Monitor the deployment in the Actions tab of your repository
+   - Access your application at your configured development domain (DEV_DOMAIN)
 
 ## Project Structure
 

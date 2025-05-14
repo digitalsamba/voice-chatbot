@@ -27,11 +27,22 @@ Before pushing to GitHub, make sure these key files are present:
 
 For deployment with GitHub Actions, you need to add these repository secrets:
 
-1. In your repository, go to "Settings" > "Secrets and variables" > "Actions"
-2. Click "New repository secret" and add the following secrets:
-   - `HOST`: The hostname or IP address of your deployment server
-   - `USERNAME`: The SSH username for your deployment server
-   - `SSH_KEY`: The SSH private key for authentication (copy the entire content of your private key file)
+1. In your repository, go to "Settings" > "Secrets and variables" > "Actions" > "Environments"
+2. Create a "development" environment
+3. Click "Add secret" for the development environment and add the following secrets:
+
+   **Required secrets:**
+   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `DOCKER_HUB_USERNAME`: Your Docker Hub username
+   - `DOCKER_HUB_TOKEN`: Your Docker Hub access token (create at Docker Hub→Settings→Security→Access Tokens)
+   - `SERVER_HOST`: The hostname or IP address of your development server
+   - `SERVER_USER`: The SSH username for your development server
+   - `SERVER_KEY`: The SSH private key for authentication (copy the entire content of your private key file)
+   - `DEV_DOMAIN`: Your development domain name (e.g., dev.voice.example.com)
+   - `LETSENCRYPT_EMAIL`: Email address for Let's Encrypt certificate notifications
+
+   **Optional secrets:**
+   - `PORT`: Custom port (defaults to 3011 if not specified)
 
 ## Initializing the Local Repository
 

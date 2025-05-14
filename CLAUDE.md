@@ -40,32 +40,35 @@ The goal is to deploy this application to a public repository and then to a serv
    - [x] Add health check endpoint to the server
    - [x] Validate Docker setup (created validation script)
 
-3. **Set Up GitHub Workflow**
+3. **Set Up GitHub Workflow for Development Environment**
    - [x] Create GitHub Actions workflow file (.github/workflows/deploy.yml)
+   - [x] Configure workflow for development deployment
    - [x] Create deployment script (deploy.sh)
    - [x] Create GitHub issue templates
    - [x] Create CONTRIBUTING.md guide
    - [x] Create GitHub setup guide (GITHUB_SETUP.md)
-   - [ ] Add repository secrets for deployment (HOST, USERNAME, SSH_KEY)
+   - [x] Create GitHub repository
+   - [x] Document required repository secrets for development in GITHUB_SETUP.md
+   - [ ] Add repository secrets to GitHub development environment
    - [ ] Configure GitHub repository to allow workflow actions and package publishing
 
-4. **Server Configuration**
-   - [ ] Create deployment directory on server
-   - [ ] Copy production docker-compose.yml to server
-   - [ ] Set up environment variables file (.env) on server containing OPENAI_API_KEY
-   - [ ] Ensure nginx-proxy and letsencrypt-companion are running correctly on server
-   - [ ] Test deployment script manually before setting up GitHub workflow
+4. **Server Configuration** (Automated in GitHub Actions Workflow)
+   - [x] Automate creation of deployment directory on server
+   - [x] Automate docker-compose.yml generation on server
+   - [x] Automate environment variables setup on server
+   - [x] Configure proper virtual host name for nginx-proxy integration
+   - [x] Create SERVER_SETUP.md guide for nginx-proxy setup
 
 5. **SSL/TLS Integration**
-   - [ ] Verify that the container environment variables are correctly set for nginx-proxy integration
-   - [ ] Ensure port 80 and 443 are accessible for Let's Encrypt verification
-   - [ ] Test certificate issuance manually
+   - [x] Configure container environment variables for nginx-proxy integration
+   - [x] Document port requirements (80 and 443) in SERVER_SETUP.md
+   - [x] Include certificate testing instructions in SERVER_SETUP.md
 
 6. **Monitoring and Maintenance**
-   - [ ] Set up logging with volume mount to host system
-   - [ ] Add health check endpoint to the application
-   - [ ] Create backup script for logs and any persistent data
-   - [ ] Set up monitoring alerts for the server
+   - [x] Set up logging with volume mount to host system
+   - [x] Add health check endpoint to the application
+   - [x] Configure Docker container restart policy
+   - [ ] Set up monitoring alerts for the server (optional future enhancement)
 
 ## Architecture Overview
 

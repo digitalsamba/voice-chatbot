@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Deploy Voice Chatbot - Development
 
 on:
   push:
@@ -8,46 +8,98 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: development # Specify the development environment to use its secrets
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Create .env file
+        run: |
+          echo "# OpenAI API key for the voice chatbot" > .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "PORT=${{ secrets.PORT || 3011 }}" >> .env
+          echo "NODE_ENV=development" >> .env
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Login to GitHub Container Registry
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/voice-chatbot:latest
+          tags: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+            ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
           script: |
             # Create deployment directory if it doesn't exist
             mkdir -p /opt/voice-chatbot
             cd /opt/voice-chatbot
             
-            # Clone repository if it doesn't exist, otherwise pull latest changes
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/${{ github.repository }} .
-            else
-              git pull
-            fi
+            # Create .env file on server
+            cat > .env << EOL
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            PORT=${{ secrets.PORT || 3011 }}
+            NODE_ENV=development
+            VIRTUAL_HOST=${{ secrets.DEV_DOMAIN || 'dev.example.com' }}
+            VIRTUAL_PORT=${{ secrets.PORT || 3011 }}
+            LETSENCRYPT_HOST=${{ secrets.DEV_DOMAIN || 'dev.example.com' }}
+            LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
+            EOL
             
-            # Run deployment script
-            bash deploy.sh
+            # Create or update docker-compose.yml
+            cat > docker-compose.yml << EOL
+            version: '3'
+            
+            services:
+              voice-chatbot:
+                image: ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+                restart: unless-stopped
+                expose:
+                  - "${{ secrets.PORT || 3011 }}"
+                env_file:
+                  - .env
+                volumes:
+                  - ./logs:/app/logs
+                networks:
+                  - nginx-proxy-network
+            
+            networks:
+              nginx-proxy-network:
+                external: true
+            EOL
+            
+            # Pull the latest Docker image
+            docker-compose pull
+            
+            # Stop and remove existing container
+            docker-compose down
+            
+            # Start the new container
+            docker-compose up -d
+            
+            # Show logs
+            docker-compose logs --tail 50
