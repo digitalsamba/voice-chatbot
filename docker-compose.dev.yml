@@ -4,7 +4,6 @@ services:
   voice-chatbot:
     build:
       context: .
-      dockerfile: Dockerfile.simple
     restart: unless-stopped
     ports:
       - "3011:3011"

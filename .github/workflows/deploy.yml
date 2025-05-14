@@ -55,8 +55,7 @@ jobs:
 
       - name: Build and push Docker image manually
         run: |
-          # Copy the simpler Dockerfile for development
-          cp Dockerfile.simple Dockerfile
+          # The Dockerfile is already the simplified version, no need to copy
           
           # Build the Docker image with verbose output
           docker build --no-cache -t ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev .

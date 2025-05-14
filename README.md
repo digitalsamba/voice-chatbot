@@ -135,7 +135,8 @@ This project includes a GitHub Actions workflow for continuous integration and d
 
 1. Automatically builds and pushes Docker image to Docker Hub with `dev` and commit SHA tags
 2. Deploys to your development server using SSH
-3. Sets up all necessary configuration files on the server with development-specific settings
+3. Sets up all necessary configuration using environment variables
+4. Streamlined for reliable builds - no complex build process required
 
 To set up the development CI/CD pipeline:
 
