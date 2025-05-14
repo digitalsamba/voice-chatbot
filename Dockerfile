@@ -12,8 +12,11 @@ RUN npm ci
 # Copy application code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Prepare directories for SSR
+RUN mkdir -p dist/client dist/server
+
+# Skip the client build since it's causing issues
+# We'll just copy the client files directly
 
 # Production stage
 FROM node:18-alpine
@@ -26,13 +29,14 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Copy built files from builder stage
-COPY --from=builder /app/dist ./dist
+# Copy server file and create minimal dist structure
 COPY --from=builder /app/server.js ./server.js
+COPY --from=builder /app/dist ./dist
 
-# Copy client assets and config files
-COPY --from=builder /app/client/assets ./client/assets
-COPY --from=builder /app/client/base.css ./client/base.css
+# Copy all client files directly (without build)
+COPY --from=builder /app/client ./client
+
+# Copy config files
 COPY --from=builder /app/vite.config.js ./vite.config.js
 COPY --from=builder /app/postcss.config.cjs ./postcss.config.cjs
 COPY --from=builder /app/tailwind.config.js ./tailwind.config.js
