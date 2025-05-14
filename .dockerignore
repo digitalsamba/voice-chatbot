@@ -1,0 +1,42 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Docker files
+.dockerignore
+docker-compose*.yml
+Dockerfile
+
+# Node.js files
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project files
+CLAUDE.md
+README-enhanced.md
+*.md
+!README.md
+
+# Build output
+client/dist
+dist
+
+# Logs
+logs
+*.log

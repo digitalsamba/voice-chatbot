@@ -1,8 +1,16 @@
+/**
+ * ModelSelection.js
+ *
+ * This component renders the model selection menu with tooltips for each model option.
+ * All comments are in British English.
+ */
+
 import React, { useState } from "react";
 
 export default function ModelSelection({ onSelectRealTime }) {
   const [hoveredModel, setHoveredModel] = useState(null);
 
+  // Define tooltip content for different model options
   const tooltips = {
     other: (
       <div className="max-w-xs p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-sm">
@@ -30,7 +38,7 @@ export default function ModelSelection({ onSelectRealTime }) {
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          {/* Other Models Button */}
+          {/* Other Models Button (disabled) */}
           <div className="relative flex-1 group">
             <button
               className="w-full px-4 py-3 text-sm sm:text-base
@@ -57,7 +65,7 @@ export default function ModelSelection({ onSelectRealTime }) {
             )}
           </div>
 
-          {/* Real-Time Button */}
+          {/* Real-Time Model Button */}
           <div className="relative flex-1 group">
             <button
               className="w-full px-4 py-3 text-sm sm:text-base
