@@ -82,8 +82,9 @@ jobs:
             DEPLOY_DIR="${{ secrets.DEPLOY_DIR || '/opt/deployment/voice-chatbot-dev' }}"
             DOCKER_NETWORK="${{ secrets.DOCKER_NETWORK || 'proxy' }}"
             
-            # Create directories if needed
-            mkdir -p ${DEPLOY_DIR}/logs
+            # Create directories if needed (with sudo)
+            sudo mkdir -p ${DEPLOY_DIR}/logs
+            sudo chown -R $(whoami):$(whoami) ${DEPLOY_DIR}
             
             # Stop and remove existing container
             docker stop voice-chatbot-dev || true
