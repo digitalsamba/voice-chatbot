@@ -35,9 +35,11 @@ For deployment with GitHub Actions, you need to add these repository secrets:
    - `OPENAI_API_KEY`: Your OpenAI API key
    - `DOCKER_HUB_USERNAME`: Your Docker Hub username
    - `DOCKER_HUB_TOKEN`: Your Docker Hub access token (create at Docker Hub→Settings→Security→Access Tokens)
-   - `SERVER_HOST`: The hostname or IP address of your development server
+   - `SERVER_HOST`: The hostname of your development server
+   - `SERVER_IP`: The IP address of your development server (use this if hostname resolution fails)
    - `SERVER_USER`: The SSH username for your development server
    - `SERVER_KEY`: The SSH private key for authentication (copy the entire content of your private key file)
+   - `SSH_PORT`: The SSH port for your server (defaults to 22 if not specified)
    - `DEV_DOMAIN`: Your development domain name (e.g., dev.voice.example.com)
    - `LETSENCRYPT_EMAIL`: Email address for Let's Encrypt certificate notifications
 

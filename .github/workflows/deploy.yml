@@ -69,9 +69,12 @@ jobs:
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ secrets.SERVER_IP || secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          script_stop: true  # Stop script after first error
+          debug: true  # Enable debug mode
           script: |
             # Define deployment variables
             PORT="${{ secrets.PORT || 3011 }}"
