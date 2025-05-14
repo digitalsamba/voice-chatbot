@@ -86,12 +86,13 @@ jobs:
             sudo mkdir -p ${DEPLOY_DIR}/logs
             sudo chown -R $(whoami):$(whoami) ${DEPLOY_DIR}
             
-            # Stop and remove existing container
-            docker stop voice-chatbot-dev || true
-            docker rm voice-chatbot-dev || true
+            # Stop and remove existing container with sudo
+            sudo docker stop voice-chatbot-dev || true
+            sudo docker rm voice-chatbot-dev || true
             
-            # Pull the latest image
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+            # Pull the latest images with sudo
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:${{ github.sha }}
             
             # Create custom vite config file with allowed hosts
             cat > ${DEPLOY_DIR}/vite.config.override.js << EOF
@@ -122,8 +123,8 @@ jobs:
             };
             EOF
             
-            # Run the container with docker run
-            docker run -d --restart unless-stopped \
+            # Run the container with sudo docker run
+            sudo docker run -d --restart unless-stopped \
               --name voice-chatbot-dev \
               --network ${DOCKER_NETWORK} \
               -p ${PORT}:${PORT} \
@@ -137,7 +138,7 @@ jobs:
               -e VITE_ALLOWED_HOST=${DEV_DOMAIN} \
               -v ${DEPLOY_DIR}/logs:/app/logs \
               -v ${DEPLOY_DIR}/vite.config.override.js:/app/vite.config.js \
-              ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:dev
+              ${{ secrets.DOCKER_HUB_USERNAME }}/voice-chatbot:${{ github.sha }}
             
-            # Show container logs
-            docker logs voice-chatbot-dev --tail 20
+            # Show container logs with sudo
+            sudo docker logs voice-chatbot-dev --tail 20
