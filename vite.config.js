@@ -14,14 +14,11 @@ export default {
     external: ["use-sync-external-store"],
   },
   server: {
-    // Allow all hosts including your dev domains
-    host: '0.0.0.0',
-    allowedHosts: [
-      'localhost',
-      '127.0.0.1',
-      'voicebot-dev.digitalsamba.com',
-      'dev.example.com',
-      '.digitalsamba.com' // Allow all subdomains of digitalsamba.com
-    ]
+    // Use environment variables or fallback to defaults
+    host: process.env.VITE_HOST || '0.0.0.0',
+    allowedHosts: process.env.VITE_ALLOWED_HOST ? 
+      [process.env.VITE_ALLOWED_HOST, 'localhost', '127.0.0.1'] : 
+      ['localhost', '127.0.0.1', 'voicebot-dev.digitalsamba.com', '.digitalsamba.com'],
+    cors: process.env.VITE_ALLOW_ORIGIN === 'true'
   },
 };

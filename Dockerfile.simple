@@ -21,5 +21,9 @@ EXPOSE 3011
 # Set permissions for mounted volumes
 RUN chmod -R 777 /app/logs
 
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Command to run the application in development mode
-CMD ["npm", "run", "dev"]
+CMD ["/app/start.sh"]
