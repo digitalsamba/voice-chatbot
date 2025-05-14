@@ -52,10 +52,26 @@ NODE_ENV=development
 
 ## Development
 
+### Option 1: Local Development
+
 Start the development server:
 
 ```bash
 npm run dev
+```
+
+The application will be available at http://localhost:3011
+
+### Option 2: Docker Development
+
+For a containerized development environment with hot-reloading:
+
+```bash
+# Create an .env file with your OPENAI_API_KEY first
+echo "OPENAI_API_KEY=your_openai_api_key_here" > .env
+
+# Start the development container
+docker-compose -f docker-compose.dev.yml up
 ```
 
 The application will be available at http://localhost:3011
@@ -94,18 +110,21 @@ docker run -p 3011:3011 --env-file .env voice-chatbot
 
 ### Using docker-compose
 
+For development environment:
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+For production environment:
 ```bash
 docker-compose up -d
 ```
 
-### Production Deployment
+### Production Deployment with Nginx Proxy
 
 For production with nginx-proxy:
 
 ```bash
-# Set your GitHub username
-export GITHUB_USERNAME=yourusername
-
 # Deploy with the production configuration
 docker-compose -f docker-compose.prod.yml up -d
 ```

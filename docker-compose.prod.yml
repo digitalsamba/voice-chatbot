@@ -2,7 +2,7 @@ version: '3'
 
 services:
   voice-chatbot:
-    image: ghcr.io/${GITHUB_USERNAME:-yourusername}/voice-chatbot:latest
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/voice-chatbot:latest
     restart: unless-stopped
     expose:
       - "3011"
@@ -10,10 +10,12 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - NODE_ENV=production
       - PORT=3011
-      - VIRTUAL_HOST=your-domain.com
+      - VITE_HOST=0.0.0.0
+      - VITE_ALLOWED_HOST=${DOMAIN:-your-domain.com}
+      - VIRTUAL_HOST=${DOMAIN:-your-domain.com}
       - VIRTUAL_PORT=3011
-      - LETSENCRYPT_HOST=your-domain.com
-      - LETSENCRYPT_EMAIL=your-email@example.com
+      - LETSENCRYPT_HOST=${DOMAIN:-your-domain.com}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-your-email@example.com}
     volumes:
       - ./logs:/app/logs
     healthcheck:

@@ -1,51 +1,29 @@
-FROM node:18-alpine AS builder
-
-# Set working directory
-WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install all dependencies including dev dependencies
-RUN npm ci
-
-# Copy application code
-COPY . .
-
-# Prepare directories for SSR
-RUN mkdir -p dist/client dist/server
-
-# Skip the client build since it's causing issues
-# We'll just copy the client files directly
-
-# Production stage
 FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production
+# Install dependencies (including dev dependencies for development mode)
+RUN npm install
 
-# Copy server file and create minimal dist structure
-COPY --from=builder /app/server.js ./server.js
-COPY --from=builder /app/dist ./dist
+# Copy application code
+COPY . .
 
-# Copy all client files directly (without build)
-COPY --from=builder /app/client ./client
-
-# Copy config files
-COPY --from=builder /app/vite.config.js ./vite.config.js
-COPY --from=builder /app/postcss.config.cjs ./postcss.config.cjs
-COPY --from=builder /app/tailwind.config.js ./tailwind.config.js
-
-# Create necessary directories for logs
+# Create logs directory
 RUN mkdir -p logs
 
 # Expose the port the app runs on
 EXPOSE 3011
 
-# Command to run the application
-CMD ["node", "server.js"]
+# Set permissions for mounted volumes
+RUN chmod -R 777 /app/logs
+
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Command to run the application in development mode
+CMD ["/app/start.sh"]

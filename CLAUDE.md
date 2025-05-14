@@ -7,14 +7,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Development
 
 ```bash
-# Start the development server
+# Local development
 npm run dev
+
+# Docker development 
+docker-compose -f docker-compose.dev.yml up
 
 # Build the client and server for production
 npm run build
 
 # Start the production server
 npm start
+
+# Run production with Docker
+docker-compose up -d
+
+# Deploy to production with nginx-proxy
+docker-compose -f docker-compose.prod.yml up -d
 
 # Run linting
 npm run lint
@@ -34,11 +43,12 @@ The goal is to deploy this application to a public repository and then to a serv
 
 2. **Dockerize Application**
    - [x] Create Dockerfile for the application
-   - [x] Create docker-compose.yml for local development and testing
-   - [x] Create production docker-compose.yml for nginx-proxy integration (docker-compose.prod.yml)
+   - [x] Create docker-compose.yml for production
+   - [x] Create docker-compose.dev.yml for local development with hot-reloading
+   - [x] Create docker-compose.prod.yml for nginx-proxy integration
    - [x] Create .dockerignore file
    - [x] Add health check endpoint to the server
-   - [x] Validate Docker setup (created validation script)
+   - [x] Create start.sh script for environment variable handling
 
 3. **Set Up GitHub Workflow for Development Environment**
    - [x] Create GitHub Actions workflow file (.github/workflows/deploy.yml)

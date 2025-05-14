@@ -2,21 +2,29 @@ version: '3'
 
 services:
   voice-chatbot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.simple
     restart: unless-stopped
     ports:
       - "3011:3011"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3011
       - VITE_HOST=0.0.0.0
       - VITE_ALLOWED_HOST=localhost
+      - VITE_ALLOW_ORIGIN=true
+      - VITE_FORCE_DEV_SERVER=true
     volumes:
       - ./logs:/app/logs
+      - ./client:/app/client
+      # Mount specific files for hot-reloading during development
+      - ./vite.config.js:/app/vite.config.js
+      - ./server.js:/app/server.js
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:3011/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
       start_period: 10s
